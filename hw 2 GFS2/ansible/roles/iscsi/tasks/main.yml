@@ -48,7 +48,7 @@
   - name: "Enable and Start ISCSI Service"
     systemd:
       name: "{{ item }}"
-      state: started
+      state: restarted
       enabled: true
     with_items:
       - iscsid
