@@ -3,5 +3,5 @@
 ${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{ endif } local_address=${server.network_interface[0].ip_address} ansible_user=admind
 %{ endfor ~}
 
-[iscsi-server]
+[iscsi_server]
 ${iscsi-server.name} ansible_host=%{ if iscsi-server.network_interface[0].nat_ip_address != "" }${iscsi-server.network_interface[0].nat_ip_address}%{ endif } local_address=${iscsi-server.network_interface[0].ip_address} ansible_user=admind
