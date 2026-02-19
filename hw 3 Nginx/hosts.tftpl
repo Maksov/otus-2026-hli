@@ -1,0 +1,10 @@
+[lb_server]
+${lb-server.name} ansible_host=%{ if lb-server.network_interface[0].nat_ip_address != "" }${lb-server.network_interface[0].nat_ip_address}%{ endif } local_address=${lb-server.network_interface[0].ip_address} ansible_user=admind
+
+[frontends]
+%{ for server in nodes ~}
+${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{ endif } local_address=${server.network_interface[0].ip_address} ansible_user=admind
+%{ endfor ~}
+
+[backend]
+${backend.name} ansible_host=%{ if backend.network_interface[0].nat_ip_address != "" }${backend.network_interface[0].nat_ip_address}%{ endif } local_address=${backend.network_interface[0].ip_address} ansible_user=admind

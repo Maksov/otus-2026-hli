@@ -1,10 +1,10 @@
 
 // Create VM
-resource "yandex_compute_instance" "backend" {
+resource "yandex_compute_instance" "lb-server" {
 
-  name                      = "backend"
+  name                      = "lb"
   platform_id               = "standard-v3"
-  hostname                  = "backend"
+  hostname                  = "lb"
   allow_stopping_for_update = true
 
   resources {
