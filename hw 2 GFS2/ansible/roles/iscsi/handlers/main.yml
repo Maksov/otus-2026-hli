@@ -1,6 +1,14 @@
 ---
+- name: Restart multipathd
+  systemd:
+    name: multipathd
+    state: restarted
+    enabled: true
+
 - name: Restart iscsid
-  service:
+  systemd:
     name: iscsid
     state: restarted
+    enabled: true
+
 # handlers file for iscsi

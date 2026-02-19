@@ -40,6 +40,8 @@
        line: "InitiatorName=iqn.2026-02.ru.otus:{{ ansible_hostname }}"
        state: present
     when: ansible_hostname is match("pcs-*")
+    notify:
+      - Restart iscsid
     
     
 
@@ -56,7 +58,7 @@
     shell: |
          iscsiadm -m discovery -t st -p 10.180.2.204
          iscsiadm -m discovery -t st -p 10.180.3.204
-         iscsiadm -m node -l -T iqn.2026-02.ru.otus:storage-iscsi.target00
+         iscsiadm -m node -l 
     when: ansible_hostname is match("pcs-*")
 
   - name: Setup multipath in PCS Servers
@@ -70,6 +72,8 @@
       dest: /etc/multipath.conf
       follow: yes
     when: ansible_hostname is match("pcs-*")
+  #  notify:
+  #    - Restart multipathd
 
   - name: Setup multipath in PCS Servers
     shell: |
