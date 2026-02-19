@@ -21,7 +21,7 @@ resource "yandex_compute_instance" "fr-servers" {
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.pcs-servers-subnet-01.id
+    subnet_id = yandex_vpc_subnet.lb-otus-subnet-01.id
     nat       = true
   }
 
