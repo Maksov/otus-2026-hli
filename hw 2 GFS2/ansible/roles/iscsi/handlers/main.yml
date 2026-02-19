@@ -1,2 +1,6 @@
 ---
+- name: Restart iscsid
+  service:
+    name: iscsid
+    state: restarted
 # handlers file for iscsi

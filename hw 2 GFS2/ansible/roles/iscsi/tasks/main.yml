@@ -42,11 +42,7 @@
        notify: Restart iscsid
     when: ansible_hostname is match("pcs-*")
     
-    handlers:
-      - name: Restart iscsid
-        service:
-          name: iscsid
-          state: restarted
+    
 
   - name: Connect iscsi in PCS Servers
     shell: |
