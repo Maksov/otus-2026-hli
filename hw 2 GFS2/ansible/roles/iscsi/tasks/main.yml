@@ -61,10 +61,10 @@
          iscsiadm -m node -l 
     when: ansible_hostname is match("pcs-*")
 
-  - name: Setup multipath in PCS Servers
-    shell: |
-        mpathconf --enable --with_multipathd y
-    when: ansible_hostname is match("pcs-*")
+  # - name: Setup multipath in PCS Servers
+  #   shell: |
+  #       mpathconf --enable --with_multipathd y
+  #   when: ansible_hostname is match("pcs-*")
 
   - name: Copy multipath conf file
     ansible.builtin.copy:
