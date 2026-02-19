@@ -1,6 +1,9 @@
 resource "local_file" "hosts" {
   filename = "inventory"
-  depends_on = [yandex_compute_instance.pcs-servers]
+  depends_on = [
+    yandex_compute_instance.fr-servers,
+    yandex_compute_instance.lb-server,
+    yandex_compute_instance.backend]
   content = templatefile("./hosts.tftpl", {
     nodes = yandex_compute_instance.fr-servers
     lb-server = yandex_compute_instance.lb-server
