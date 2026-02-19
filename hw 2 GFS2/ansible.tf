@@ -17,3 +17,4 @@ resource "null_resource" "ansible_provisioning" {
     interpreter = ["bash", "-c"]
   }
 }
+
