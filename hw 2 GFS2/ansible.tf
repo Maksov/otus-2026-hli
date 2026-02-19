@@ -7,6 +7,7 @@ resource "local_file" "hosts" {
   })
 }
 
+/*
 resource "null_resource" "ansible_provisioning" {
   depends_on = [yandex_compute_instance.pcs-servers]
   provisioner "local-exec" {
@@ -16,3 +17,4 @@ resource "null_resource" "ansible_provisioning" {
     interpreter = ["bash", "-c"]
   }
 }
+*/
