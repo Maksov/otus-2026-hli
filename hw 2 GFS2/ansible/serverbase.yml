@@ -4,3 +4,10 @@
   tasks:
     - name: Пинг хоста
       ansible.builtin.ping:
+
+- name: Install and confifuration ISCSI
+  hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - iscsi
