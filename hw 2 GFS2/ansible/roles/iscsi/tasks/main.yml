@@ -43,13 +43,6 @@
     
     
 
-  - name: Connect iscsi in PCS Servers
-    shell: |
-         iscsiadm -m discovery -t st -p 10.180.2.204
-         iscsiadm -m discovery -t st -p 10.180.3.204
-         iscsiadm -m node -l -T iqn.2026-02.ru.otus:storage-iscsi.target00
-    when: ansible_hostname is match("pcs-*")
-
   - name: "Enable and Start ISCSI Service"
     systemd:
       name: "{{ item }}"
@@ -57,6 +50,13 @@
       enabled: true
     with_items:
       - iscsid
+    when: ansible_hostname is match("pcs-*")
+
+  - name: Connect iscsi in PCS Servers
+    shell: |
+         iscsiadm -m discovery -t st -p 10.180.2.204
+         iscsiadm -m discovery -t st -p 10.180.3.204
+         iscsiadm -m node -l -T iqn.2026-02.ru.otus:storage-iscsi.target00
     when: ansible_hostname is match("pcs-*")
 
   - name: Setup multipath in PCS Servers
