@@ -6,3 +6,13 @@ resource "local_file" "hosts" {
     iscsi-server = yandex_compute_instance.iscsi-server
   })
 }
+
+resource "null_resource" "ansible_provisioning" {
+  depends_on = [yandex_compute_instance.nodes]
+  provisioner "local-exec" {
+    command = "ansible-playbook ./ansible/serverbase.yml"
+
+    working_dir = path.module
+    interpreter = ["bash", "-c"]
+  }
+}
