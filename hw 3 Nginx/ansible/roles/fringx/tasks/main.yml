@@ -1,5 +1,14 @@
 ---
 # tasks file for fringx
+
+- name: Ensure web root directory exists
+  file:
+    path: /var/www/html
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+
 - name: Put static index page
   template:
     src: index.html.j2
@@ -9,7 +18,7 @@
 - name: Configure angie site
   template:
     src: fr.conf.j2
-    dest: /etc/nginx/sites-available/default
+    dest: /etc/angie/http.d/default.conf
     mode: "0644"
 
 - name: Test angie config

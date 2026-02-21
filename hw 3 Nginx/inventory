@@ -1,0 +1,9 @@
+[lb_server]
+lb ansible_host=158.160.189.248 local_address=10.160.0.21 ansible_user=admind
+
+[frontends]
+fr-1 ansible_host=158.160.205.99 local_address=10.160.0.8 ansible_user=admind
+fr-2 ansible_host=158.160.205.134 local_address=10.160.0.14 ansible_user=admind
+
+[backend]
+backend ansible_host=158.160.177.63 local_address=10.160.0.15 ansible_user=admind

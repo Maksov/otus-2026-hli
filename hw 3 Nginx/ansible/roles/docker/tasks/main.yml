@@ -1,5 +1,9 @@
 ---
 # tasks file for docker
+- name: Gather installed packages facts
+  package_facts:
+    manager: auto
+    
 - name: ensure old versions of docker are not installed
   package:
     name: "{{ item }}"
@@ -24,11 +28,10 @@
   when: item not in ansible_facts.packages
 
 
-- name: Add Docker key
-  get_url:
-    url: 'https://download.docker.com/linux/ubuntu/gpg'
-    dest: '/etc/apt/trusted.gpg.d/docker.asc'
-    mode: 0644
+- name: Add Docker GPG key via curl
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/trusted.gpg.d/docker.asc
+  args:
+    creates: /etc/apt/trusted.gpg.d/docker.asc
 
 - name: 'Add Docker repo'
   apt_repository:

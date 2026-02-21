@@ -8,10 +8,10 @@
   loop:
     - /opt/webdebugger
 
-- name: copy backdrop compose file
+- name: copy compose file
   template:
-    src: backdrop.yml
-    dest: "/var/webdebugger/docker-compose.yaml"
+    src: docker-compose.yaml
+    dest: "/opt/webdebugger/docker-compose.yaml"
 
 - name: Run docker-compose file
   community.docker.docker_compose_v2:
