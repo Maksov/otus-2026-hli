@@ -1,0 +1,12 @@
+# upstream для RR (дефолт)
+upstream fe_rr {
+  server {{ hostvars['fr-1']['ip_address'] }}:80 max_fails=2 fail_timeout=10s;
+  server {{ hostvars['fr-2']['ip_address'] }}:80 max_fails=2 fail_timeout=10s;
+}
+
+# upstream для HASH
+upstream fe_hash {
+  hash $remote_addr consistent;
+  server {{ hostvars['fr-1']['ip_address'] }}:80;
+  server {{ hostvars['fr-2']['ip_address'] }}:80;
+}

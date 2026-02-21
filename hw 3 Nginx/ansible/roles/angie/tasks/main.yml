@@ -1,0 +1,21 @@
+---
+# tasks file for angie
+- name: add an apt signing key for angie repo
+  shell: 'wget -qO - https://angie.software/keys/angie-signing.gpg |
+          gpg --dearmor |
+          tee /etc/apt/trusted.gpg.d/angie-signing.gpg >/dev/null'
+  args:
+    creates: /etc/apt/trusted.gpg.d/angie-signing.gpg
+
+- name: add specified angie repository into sources list using specified filename
+  apt_repository:
+    repo: "deb https://download.angie.software/angie/{{ansible_distribution|lower}}/{{ ansible_distribution_version }} {{ansible_lsb.codename}} main"
+    state: present
+    filename: angie
+    update_cache: yes
+
+- name: install angie
+  package:
+    name: angie
+    state: present
+  notify: enable angie

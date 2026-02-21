@@ -4,3 +4,24 @@
   tasks:
     - name: Пинг хоста
       ansible.builtin.ping:
+
+- name: Loadbalancer play
+  hosts: lb_server
+  become: yes
+  roles:
+    - angie
+    - lbalancer
+
+- name: Frontend play
+  hosts: frontends
+  become: yes
+  roles:
+    - angie
+    - fringx
+
+- name: Backend play
+  hosts: backend
+  become: yes
+  roles:
+    - docker
+    - backend

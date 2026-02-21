@@ -1,0 +1,23 @@
+---
+# tasks file for fringx
+- name: Put static index page
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: "0644"
+
+- name: Configure angie site
+  template:
+    src: fr.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: "0644"
+
+- name: Test angie config
+  command: angie -t
+
+- name: Enable and restart angie
+  systemd:
+    name: angie
+    enabled: true
+    state: restarted
+

@@ -1,0 +1,57 @@
+---
+# tasks file for docker
+- name: ensure old versions of docker are not installed
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - containerd
+    - docker-compose
+    - docker-compose-v2
+    - docker-doc
+    - docker-engine
+    - docker.io
+    - podman-docker
+    - runc
+  when: item in ansible_facts.packages
+
+- name: install requirements
+  package:
+    name: "{{ item }}"
+  loop:
+    - ca-certificates
+    - gnupg
+  when: item not in ansible_facts.packages
+
+
+- name: Add Docker key
+  get_url:
+    url: 'https://download.docker.com/linux/ubuntu/gpg'
+    dest: '/etc/apt/trusted.gpg.d/docker.asc'
+    mode: 0644
+
+- name: 'Add Docker repo'
+  apt_repository:
+    repo: >
+      deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc]
+      https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    filename: 'docker.list'
+
+- name: update cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600  #1 hour
+  when: '"docker-ce" not in ansible_facts.packages'
+
+- name: install docker components
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  when: item not in ansible_facts.packages
+  notify: start docker

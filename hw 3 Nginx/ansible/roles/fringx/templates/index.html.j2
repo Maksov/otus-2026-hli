@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ inventory_hostname }}</title>
+</head>
+<body>
+  <h1>Frontend ответил: {{ inventory_hostname }}</h1>
+
+  <ul>
+    <li><b>ansible_host:</b> {{ ansible_host }}</li>
+    <li><b>private IP (default):</b> {{ ansible_default_ipv4.address | default('n/a') }}</li>
+    <li><b>frontend label:</b>
+      {% if inventory_hostname == 'fe1' %}FE-1{% elif inventory_hostname == 'fe2' %}FE-2{% else %}FE{% endif %}
+    </li>
+  </ul>
+
+  <p>
+    Проверка бекенда: <a href="/api/">/api/</a>
+  </p>
+
+  <hr/>
+  <p>
+    Обновляй страницу несколько раз:<br/>
+    - RR: <code>http://LB_IP/</code><br/>
+    - HASH: <code>http://LB_IP:81/</code>
+  </p>
+</body>
+</html>

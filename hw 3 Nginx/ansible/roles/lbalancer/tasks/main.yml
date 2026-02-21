@@ -1,0 +1,35 @@
+---
+# tasks file for lbalancer
+# cp ./nginx/conf.d/upstreams.conf.j2 /etc/nginx/conf.d/upstreams.conf
+# cp ./nginx/sites-available/upstreams.j2 /etc/nginx/sites-available/upstreams
+- name: Template angie config files
+  ansible.builtin.template:
+    src: "angie/{{ item }}.j2"
+    dest: "/etc/angie/{{ item }}"
+  loop:
+    - conf.d/upstreams.conf
+    - sites-available/upstreams
+  mode: "0644"
+
+# cp /etc/nginx/sites-available/{default,upstreams}
+# - name: Copy file /etc/nginx/sites-available/default to upstreams
+#   ansible.builtin.copy:
+#     src: /etc/nginx/sites-available/default
+#     dest: /etc/nginx/sites-available/upstreams
+#     remote_src: true
+# ln -s /etc/nginx/sites-{available/upstreams,enabled/default}
+
+- name: Create a symbolic default link to /etc/angie/sites-available/upstreams
+  ansible.builtin.file:
+    src: /etc/angie/sites-available/upstreams
+    dest: /etc/angie/sites-enabled/default
+    state: link
+
+- name: Test angie config
+  command: angie -t
+
+- name: Enable and restart angie
+  systemd:
+    name: angie
+    enabled: true
+    state: restarted

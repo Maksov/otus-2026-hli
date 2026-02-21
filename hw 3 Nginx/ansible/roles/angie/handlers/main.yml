@@ -1,0 +1,12 @@
+---
+# handlers file for angie
+- name: enable angie
+  service:
+    name: angie
+    enabled: yes
+
+#Note that reloaded will start the service if it is not already started
+- name: reload angie
+  service:
+    name: angie
+    state: reloaded
