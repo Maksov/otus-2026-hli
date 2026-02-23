@@ -1,0 +1,23 @@
+---
+# tasks file for gfs2
+- name: Install Additional Packages For GFS2
+  apt:
+    name: 
+      - gfs2-utils
+      - "linux-modules-extra-{{ ansible_kernel }}"
+    state: present
+    update_cache: yes
+      
+
+- name: Load gfs2 kernel module immediately
+  become: true
+  community.general.modprobe:
+    name: gfs2
+    state: present
+
+- name: Ensure gfs2 module persists on reboot
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: gfs2
+    create: yes

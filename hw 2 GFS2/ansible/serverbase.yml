@@ -11,3 +11,13 @@
   become: true
   roles:
     - iscsi
+  
+
+- name: Install and confifuration Pacemaker
+  hosts: nodes
+  gather_facts: true
+  become: true
+  roles:
+    - gfs2
+    - pacemaker
+     

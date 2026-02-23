@@ -1,2 +1,115 @@
 ---
 # tasks file for pacemaker
+
+- name: Remove problematic 127.0.1.1 entry
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    state: absent
+
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ item.ip }} {{ item.name }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  loop:
+    - { name: pcs-1, ip: 10.180.3.201 }
+    - { name: pcs-2, ip: 10.180.3.202 }
+    - { name: pcs-3, ip: 10.180.3.203 }
+
+- name: Install Pacemaker
+  apt:
+    name:
+      - pacemaker
+      - pcs
+      - fence-agents
+      - dlm-controld
+      - resource-agents-extra
+    state: present
+    update_cache: yes
+
+- name: Fix DLM device path for Ubuntu 24.04
+  become: true
+  block:
+    - name: Create /dev/misc directory
+      ansible.builtin.file:
+        path: /dev/misc
+        state: directory
+        mode: '0755'
+
+    - name: Create symlink for dlm-control
+      ansible.builtin.file:
+        src: /dev/{{ item }}
+        dest: /dev/misc/{{ item }}
+        state: link
+      loop:
+        - dlm-control
+        - dlm-monitor
+        - dlm_plock
+
+- name: Set hacluster password
+  user:
+    name: hacluster
+    password: "{{ hacluster_password | password_hash('sha512') }}"
+
+- name: Start and enable pcsd
+  systemd:
+    name: pcsd
+    state: started
+    enabled: yes
+
+- name: Create DLM config directory
+  become: true
+  file:
+    path: /etc/dlm
+    state: directory
+
+- name: Configure DLM to allow start without fencing
+  become: true
+  copy:
+    dest: /etc/dlm/dlm.conf
+    content: "enable_fencing=0\n"
+
+- name: Start and enable dlm
+  systemd:
+    name: dlm
+    state: started
+    enabled: yes
+
+- name: Create mount point directory
+  file:
+    path: /mnt/gfs2_storage
+    state: directory
+
+- name: Cluster Setup (Run once on first node)
+  block:
+    - name: Authenticate nodes
+      command: "pcs host auth {{ groups['nodes'] | join(' ') }} -u hacluster -p {{ hacluster_password }}"
+      
+    - name: Setup cluster
+      command: "pcs cluster setup {{ cluster_name }} {{ groups['nodes'] | join(' ') }} --force"
+      
+    - name: Start and enable cluster
+      command: "pcs cluster start --all"
+      
+    - name: Wait for cluster to settle
+      pause:
+        seconds: 15
+
+    - name: Configure STONITH and DLM
+      shell: |
+        pcs property set stonith-enabled=false
+        pcs resource create dlm systemd:dlm op monitor interval=30s clone
+
+    - name: Create GFS2 Cluster Resources
+      shell: |
+        mkfs.gfs2 -O -p lock_dlm -t {{ cluster_name }}:shared_fs -j {{ groups['nodes'] | length }} /dev/mapper/yellow-iscsi-1 
+        pcs resource create shared_fs ocf:heartbeat:Filesystem \
+          device="/dev/mapper/yellow-iscsi-1" directory="/mnt/gfs2_storage" \
+          fstype="gfs2" options="noatime,_netdev" op monitor interval=20s clone 
+        pcs constraint order start dlm-clone then shared_fs-clone
+        pcs constraint colocation add shared_fs-clone with dlm-clone
+  run_once: true
+  delegate_to: "{{ groups['nodes'][0] }}"
