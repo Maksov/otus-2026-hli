@@ -1,2 +1,4 @@
 */.terraform.lock.hcl
 
+hw 5 PXC/ansible/roles/mysql/files/ssl/ca-key.pem
+hw 5 PXC/ansible/roles/mysql/files/ssl/server-req.pem

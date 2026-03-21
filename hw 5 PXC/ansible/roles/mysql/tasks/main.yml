@@ -1,0 +1,33 @@
+---
+- name: "Check settings"
+  ansible.builtin.include_tasks: check-settings.yml
+  tags: check
+  when: ansible_os_family not in ['RedHat', 'Rocky']
+
+
+- name: "Install packets (Debian)"
+  ansible.builtin.include_tasks: install.yml
+  tags: install
+  when: ansible_os_family not in ['RedHat', 'Rocky']
+
+- name: "Configure (Debian)"
+  ansible.builtin.include_tasks: configure.yml
+  tags: configure
+  when: ansible_os_family not in ['RedHat', 'Rocky']
+
+
+- name: "Bootstrap cluster"
+  ansible.builtin.include_tasks: bootstrap_cluster.yml
+  tags: cluster
+
+#- name: "Secure installation"
+#  ansible.builtin.include_tasks: secure.yml
+#  tags: secure
+
+#- name: "Setup DBs"
+#  ansible.builtin.include_tasks: databases.yml
+#  tags: databases
+
+#- name: "Create users"
+#  ansible.builtin.include_tasks: users.yml
+#  tags: users
