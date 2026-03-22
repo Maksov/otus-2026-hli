@@ -1,0 +1,14 @@
+---
+- name: Тест подключения
+  hosts: all
+  tasks:
+    - name: Пинг хоста
+      ansible.builtin.ping:
+
+- name: Percona XtraDB Cluster
+  hosts: nodes
+  become: yes
+  roles:
+    - mysql
+
+
