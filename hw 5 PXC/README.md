@@ -36,7 +36,114 @@ Provisioner - Ansible по внешним ip ВМ.
 - mysql //установка и настройка Percona XtraDB Cluster
 
 Структура роли
+```
+|-defaults/  
+|--main.yml   //Задание значений переменных
+|-files/
+|--ssl/       //Сертификаты
+|---ca.pem
+|---server-cert.pem
+|---server-key.pem
+|-handlers/
+|--main.yml   //Хэндлеры. Рестарт сервисов
+|-tasks/
+|--bootstrap_cluster.yml   //Настройка кластера. Bootstrap
+|--check-settings.yml
+|--configure.yml          //Конфигурация кластера. Копирование параметризированных шаблонов на сервера кластера. Копирование ssl сертификатов
+|--databases.yml          //Конфигурация БД
+|--install.yml            //Инсталляция Percona XtraDB Cluster 8.0
+|--main.yml                //Основноый плейбук роли
+|--secure.yml               
+|--users.yml
+|-templates/             //Шаблоны конфигурационных файлов
+|--etc_mysql_my.cnf.j2
+|--etc_mysql_mysqld.cnf.j2
+|--root-my-cnf.j2
+```
 
+Формрование сертификатов
+ВАЖНО!!! CN CA сертификата и серверного не должны совпадать!
+
+The Certificate Authority is used to verify the signature on certificates. These commands generate a Certificate Authority (CA) key and certificate:
+
+Generate the CA key file:
+```
+openssl genrsa 2048 > ca-key.pem
+```
+The command generates a 2048-bit RSA private key and saves the key to ca-key.pem. This key is essential for signing certificates.
+
+Generate the CA certificate file:
+
+```
+openssl req -new -x509 -nodes -days 3600
+    -key ca-key.pem -out ca.pem
+```
+The command does the following:
+
+Generates a self-signed CA certificate valid for 3600 days.
+
+Uses the previously created private key (ca-key.pem).
+
+Ensures the private key is not encrypted with the -nodes flag.
+
+Outputs the certificate to ca.pem.
+
+This CA certificate can then be used to sign other certificates for secure authentication within a system.
+
+Generate a new RSA key pair and certificate request:
+
+```
+openssl req -newkey rsa:2048 -days 3600 \
+    -nodes -keyout server-key.pem -out server-req.pem
+The command does the following:
+```
+
+Creates a 2048-bit RSA private key (server-key.pem).
+
+Generates a certificate signing request (CSR) (server-req.pem).
+
+-days 3600 sets the certificate validity period to 3600 days.
+
+-nodes ensures the private key remains unencrypted.
+
+This command reads an RSA private key from the server-key.pem file, processes the key, and then writes the processed key back to the same file, removing the passphrase.
+
+```
+openssl rsa -in server-key.pem -out server-key.pem
+```
+
+This command generates a signed certificate from a CSR using a specified CA certificate and its corresponding private key. The command also sets a defined validity period and serial number for the new certificate.
+
+```
+openssl x509 -req -in server-req.pem -days 3600 \
+    -CA ca.pem -CAkey ca-key.pem -set_serial 01 \
+    -out server-cert.pem
+```
+The command does the following:
+
+Processes a certificate signing request (CSR) from the server-req.pem file.
+
+Sets the generated certificate’s validity period to 3600 days, using the -days 3600 option.
+
+Specifies the Certificate Authority (CA) certificate, ca.pem, to sign the CSR with the -CA ca.pem option.
+
+Provides the CA certificate’s private key, ca-key.pem, for signing the CSR using the -CAkey ca-key.pem option.
+
+Assigns a serial number of 01 to the newly created certificate using the -set_serial 01 option.
+
+Writes the resulting signed certificate to the server-cert.pem file, using the -out server-cert.pem option.
+
+
+Verify certificates¶
+To check whether the server and client certificates are properly signed by the Certificate Authority (CA) certificate, run the following command:
+```
+openssl verify -CAfile ca.pem server-cert.pem
+```
+This command verifies that the server and client certificates are valid and trusted by the specified CA certificate (ca.pem). If the certificates are correctly signed, OpenSSL returns a confirmation message;
+otherwise, error details indicate issues with the certificate chain.
+```
+server-cert.pem: OK
+```
 
 4. Запуск и настройка инфраструктуры 
 
@@ -142,6 +249,53 @@ mysql> show status like 'wsrep%';
 | wsrep_thread_count               | 9                                                                                                                                              |
 +----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 82 rows in set (0.03 sec)
+```
+
+Импортируем preset sakila-db
+```
+admind@pxc-1:~/sakila-db# wget https://downloads.mysql.com/docs/sakila-db.tar.gz
+admind@pxc-1:~/sakila-db# mysql
+mysql> source sakila-schema.sql;
+mysql> source sakila-data.sql;
+```
+
+Проверяем на соседней ноде кластера
+```
+admind@pxc-2:~# mysql
+mysql> use sakila;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;\
++----------------------------+
+| Tables_in_sakila           |
++----------------------------+
+| actor                      |
+| actor_info                 |
+| address                    |
+| category                   |
+| city                       |
+| country                    |
+| customer                   |
+| customer_list              |
+| film                       |
+| film_actor                 |
+| film_category              |
+| film_list                  |
+| film_text                  |
+| inventory                  |
+| language                   |
+| nicer_but_slower_film_list |
+| payment                    |
+| rental                     |
+| sales_by_film_category     |
+| sales_by_store             |
+| staff                      |
+| staff_list                 |
+| store                      |
++----------------------------+
+23 rows in set (0.01 sec)
 ```
 
 6. Чистим облако за собой
