@@ -3,14 +3,14 @@
 - name: "Update the my.cnf"
   template: "src=etc_mysql_my.cnf.j2 dest=/etc/mysql/my.cnf owner=root mode=0644"
   register: "config_file"
-  notify:
-    - "Restart percona"
+#  notify:
+#    - "Restart percona"
 
 - name: "Update the mysqld.cnf"
   template: "src=etc_mysql_mysqld.cnf.j2 dest=/etc/mysql/mysql.conf.d/mysqld.cnf owner=root mode=0644"
   register: "config_file"
-  notify:
-    - "Restart percona"
+#  notify:
+#    - "Restart percona"
 
 # - name: "Ensure that percona is running and enabled"
 #   service:

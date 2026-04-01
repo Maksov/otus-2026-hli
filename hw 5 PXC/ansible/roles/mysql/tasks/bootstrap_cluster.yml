@@ -1,12 +1,12 @@
-- name: "Start bootstap service"
+- name: "Start bootstap service on first node"
   ansible.builtin.service:
     name: "mysql@bootstrap"
     state: "started"
-    enabled: "yes"
+    enabled: "no"
   register: mysql_service
   when: ansible_hostname == "pxc-1"
 
-- name: "Start mysql services"
+- name: "Start mysql services on nodes"
   ansible.builtin.service:
     name: "mysql"
     state: "started"
@@ -18,15 +18,15 @@
   ansible.builtin.pause:
     seconds: 3
 
-- name: "Stop bootstrap"
+- name: "Stop bootstrap on first node"
   ansible.builtin.service:
     name: "mysql@bootstrap"
-    state: "started"
-    enabled: "yes"
+    state: "stopped"
+    enabled: "no"
   register: mysql_service
   when: ansible_hostname == "pxc-1"
 
-- name: "Start mysql service on first"
+- name: "Start mysql service on first node"
   ansible.builtin.service:
     name: "mysql"
     state: "started"

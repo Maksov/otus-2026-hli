@@ -3,12 +3,19 @@
 [client]
 socket=/var/run/mysqld/mysqld.sock
 
+[sst]
+encrypt=4
+ssl-ca=ca.pem
+ssl-cert=server-cert.pem
+ssl-key=server-key.pem
+
 [mysqld]
 server-id=1
 datadir=/var/lib/mysql
 socket=/var/run/mysqld/mysqld.sock
 log-error=/var/log/mysql/error.log
 pid-file=/var/run/mysqld/mysqld.pid
+wsrep_provider_options="socket.ssl_key=server-key.pem;socket.ssl_cert=server-cert.pem;socket.ssl_ca=ca.pem"
 
 # Binary log expiration period is 604800 seconds, which equals 7 days
 binlog_expire_logs_seconds=604800
@@ -21,7 +28,7 @@ wsrep_provider=/usr/lib/galera4/libgalera_smm.so
 #If no IP is found, this implies that a new cluster needs to be created,
 #in order to do that you need to bootstrap this node
 
-wsrep_cluster_address=gcomm://10.165.0.100,10.165.0.101,10.165.0.102
+wsrep_cluster_address=gcomm://10.160.0.100,10.160.0.101,10.160.0.102
 
 # In order for Galera to work correctly binlog format should be ROW
 binlog_format=ROW
@@ -35,7 +42,7 @@ wsrep_log_conflicts
 innodb_autoinc_lock_mode=2
 
 # Node IP address
-wsrep_node_address={{ ansible_host }}
+wsrep_node_address={{ local_address }}
 # Cluster name
 wsrep_cluster_name=pxc-cluster
 

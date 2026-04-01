@@ -1,0 +1,6 @@
+[nodes]
+pxc-1 ansible_host=158.160.226.153 local_address=10.160.0.100 ansible_user=admind
+pxc-2 ansible_host=158.160.190.39 local_address=10.160.0.101 ansible_user=admind
+pxc-3 ansible_host=158.160.230.135 local_address=10.160.0.102 ansible_user=admind
+
+
