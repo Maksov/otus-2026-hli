@@ -1,0 +1,22 @@
+---
+- name: Тест подключения
+  hosts: all
+  tasks:
+    - name: Пинг хоста
+      ansible.builtin.ping:
+
+
+- name: Deploy PostgreSQL Patroni CLuster
+  hosts: db
+  become: yes
+  roles:
+    - watchdog
+    - etcd
+    - pg_patroni
+
+- name: Deploy HAProxy
+  hosts: lb
+  become: yes
+  roles:
+    - haproxy
+

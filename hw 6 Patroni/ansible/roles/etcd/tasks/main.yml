@@ -1,0 +1,30 @@
+---
+- block:  
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: install etcd
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: true
+    notify: enable etcd
+    loop:
+      - etcd-server
+      - etcd-client
+    when:
+      - "item not in ansible_facts.packages"
+
+  - name: INITIAL_CLUSTER var
+    set_fact:
+      INITIAL_CLUSTER: "{{ INITIAL_CLUSTER | default('') + item +'=http://'+hostvars[item]['local_address']+':2380,' }}"
+    loop: "{{ play_hosts }}"
+
+
+  - name: copy etcd config
+    template:
+      src: etcd.conf
+      dest: '/etc/default/etcd'
+    notify: restart etcd
+...

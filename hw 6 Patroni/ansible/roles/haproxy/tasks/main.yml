@@ -1,0 +1,13 @@
+---
+- name: install haproxy packges
+  package:
+    name: haproxy
+    state: present
+
+
+- name: copy haproxy config
+  template:
+    src: config
+    dest: /etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+...

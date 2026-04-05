@@ -1,0 +1,35 @@
+---
+- name: Ensure softdog module is loaded
+  lineinfile:
+    line: softdog
+    state: present
+    path: '/etc/modules'
+  notify: reboot server
+
+- name: Blacklist the nouveau driver module
+  find:
+    paths: /lib/modprobe.d/
+    recurse: yes
+  register: watchdog
+
+- name: Ensure softdog module is loaded
+  lineinfile:
+    regexp: 'blacklist softdog'
+    state: absent
+    path: "{{ item['path'] }}"
+  loop: "{{ watchdog['files'] }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: "'blacklist_linux' in item['path']"
+  notify: reboot server
+
+- name: add permissions for user/group
+  lineinfile:
+    path: '/etc/udev/rules.d/61-watchdog.rules'
+    line: 'KERNEL=="watchdog", OWNER="postgres", GROUP="postgres"'
+    state: present
+    create: true
+  notify: reboot server
+
+- meta: flush_handlers
+

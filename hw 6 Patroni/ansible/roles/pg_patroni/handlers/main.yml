@@ -1,0 +1,26 @@
+---
+- name: disable postgres service
+  ansible.builtin.service:
+    name: postgresql
+    enabled: no
+    state: stopped
+  listen: patroni initial
+
+- name: disable patroni service
+  ansible.builtin.service:
+    name: patroni
+    enabled: no
+    state: stopped
+  listen: patroni initial
+
+- name: remove preinstalled data
+  shell: 'rm -fr /var/lib/postgresql/17/main/*'
+  listen: patroni initial
+
+- name: restart patroni
+  ansible.builtin.service:
+    name: patroni
+    state: "started"
+    enabled: "yes"
+  listen: patroni restart
+...

@@ -1,0 +1,57 @@
+---
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+      manager: auto
+
+- name: install common app
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop:
+    - wget
+    - gnupg2
+    - lsb-release
+    - curl
+    - pgloader
+  when: "item not in ansible_facts.packages"
+
+- name: "Install percona-release package"
+  shell: |
+      wget "https://repo.percona.com/apt/percona-release_latest.{{ ansible_distribution_release }}_all.deb"
+      dpkg -i percona-release_latest.{{ ansible_distribution_release }}_all.deb
+
+- name: setup percona release
+  shell: 'percona-release setup ppg-17'
+
+- name: install packages
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+  loop:
+    - percona-postgresql-17
+    - percona-patroni
+  notify: patroni initial
+  when: "item not in ansible_facts.packages"
+
+# - name: copy hosts
+#   template:
+#     src: hosts
+#     dest: /etc/hosts
+
+- name: set watchdog permissions
+  file:
+    path: /dev/watchdog
+    owner: postgres
+    group: postgres
+    mode: 0600
+- meta: flush_handlers
+
+- name: copy patroni config
+  template:
+    src: patroni.conf
+    dest: /etc/patroni/patroni.yml
+  notify: patroni restart
+
+
+...

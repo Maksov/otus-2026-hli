@@ -1,0 +1,5 @@
+- name: reboot server
+  reboot:
+    reboot_timeout: 60 #Waiting host booting 60 sec
+  when:
+    - ansible_check_mode == false
