@@ -1,0 +1,6 @@
+---
+# vars file for test
+  cluster_name: "gfs_cluster"
+  hacluster_password: "otus"
+  shared_dev: "/dev/mapper/mpatha"
+  mount_point: "/mnt/gfs2_storage"

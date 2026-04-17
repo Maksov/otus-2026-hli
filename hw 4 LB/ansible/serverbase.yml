@@ -1,0 +1,31 @@
+---
+- name: Тест подключения
+  hosts: all
+  tasks:
+    - name: Пинг хоста
+      ansible.builtin.ping:
+
+- name: Install and configuration ISCSI
+  hosts: iscsi_net
+  gather_facts: true
+  become: true
+  roles:
+    - iscsi
+  
+
+- name: Install and configuration Pacemaker
+  hosts: nodes
+  gather_facts: true
+  become: true
+  roles:
+    - gfs2
+    - pacemaker
+    - angie
+    
+     
+- name: Install and configuration Percona Server
+  hosts: db_servers
+  gather_facts: true
+  become: true
+  roles:
+    - bmeme.percona_server

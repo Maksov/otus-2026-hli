@@ -1,0 +1,14 @@
+[nodes]
+pcs-1 ansible_host=178.154.209.15 local_address=10.160.0.36 ansible_user=admind
+pcs-2 ansible_host=178.154.232.25 local_address=10.160.0.21 ansible_user=admind
+
+[iscsi_server]
+iscsi ansible_host=178.154.210.15 local_address=10.180.1.5 ansible_user=admind
+
+[iscsi_net:children]
+nodes
+iscsi_server
+
+[db_servers]
+db ansible_host=158.160.239.167 local_address=10.160.0.20 ansible_user=admind
+

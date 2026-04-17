@@ -22,11 +22,39 @@ resource "yandex_vpc_network" "ru-central1-d-servers-network" {
 // Create Networks
 
 // Create Subnets
-resource "yandex_vpc_subnet" "lb-otus-subnet-01" {
-  name           = "lb-otus-subnet-01"
+resource "yandex_vpc_subnet" "pcs-servers-subnet-01" {
+  name           = "pcs-servers-subnet-01"
   zone           = var.zone
   network_id     = yandex_vpc_network.ru-central1-d-servers-network.id
   v4_cidr_blocks = ["10.160.0.0/24"]
+}
+
+resource "yandex_vpc_subnet" "pcs-servers-subnet-02" {
+  name           = "pcs-servers-subnet-02"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.ru-central1-d-servers-network.id
+  v4_cidr_blocks = ["10.180.5.0/24"]
+}
+
+resource "yandex_vpc_subnet" "iscsi-server-subnet-01" {
+  name           = "iscsi-servers-subnet-01"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.ru-central1-d-servers-network.id
+  v4_cidr_blocks = ["10.180.1.0/24"]
+}
+
+resource "yandex_vpc_subnet" "iscsi-server-subnet-02" {
+  name           = "iscsi-servers-subnet-02"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.ru-central1-d-servers-network.id
+  v4_cidr_blocks = ["10.180.2.0/24"]
+}
+
+resource "yandex_vpc_subnet" "iscsi-server-subnet-03" {
+  name           = "iscsi-servers-subnet-03"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.ru-central1-d-servers-network.id
+  v4_cidr_blocks = ["10.180.3.0/24"]
 }
 
 // Create Subnets
