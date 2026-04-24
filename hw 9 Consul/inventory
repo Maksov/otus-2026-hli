@@ -1,0 +1,26 @@
+[nodes]
+pcs-1 ansible_host=10.160.0.36 ip=10.160.0.36 ansible_user=admind
+pcs-2 ansible_host=10.160.0.16 ip=10.160.0.16 ansible_user=admind
+
+[iscsi_server]
+iscsi ansible_host=10.180.1.34  ip=10.180.1.34 ansible_user=admind
+
+[iscsi_net:children]
+nodes
+iscsi_server
+
+[db_servers]
+db ansible_host=10.160.0.20 ip=10.160.0.20 ansible_user=admind
+
+[jump_server]
+jump ansible_host=10.160.0.13 ip=10.160.0.13 ansible_user=admind
+
+[cs_servers]
+cs-1 ansible_host=10.160.0.21 ip=10.160.0.21 ansible_user=admind
+cs-2 ansible_host=10.160.0.14 ip=10.160.0.14 ansible_user=admind
+cs-3 ansible_host=10.160.0.7 ip=10.160.0.7 ansible_user=admind
+
+
+[all:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyJump="admind@81.26.183.61"'
+

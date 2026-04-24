@@ -1,0 +1,78 @@
+---
+# tasks file for angie
+- name: add an apt signing key for angie repo
+  shell: 'wget -qO - https://angie.software/keys/angie-signing.gpg |
+          gpg --dearmor |
+          tee /etc/apt/trusted.gpg.d/angie-signing.gpg >/dev/null'
+  args:
+    creates: /etc/apt/trusted.gpg.d/angie-signing.gpg
+
+- name: add specified angie repository into sources list using specified filename
+  apt_repository:
+    repo: "deb https://download.angie.software/angie/{{ansible_distribution|lower}}/{{ ansible_distribution_version }} {{ansible_lsb.codename}} main"
+    state: present
+    filename: angie
+    update_cache: yes
+
+- name: install angie
+  package:
+    name: angie
+    state: present
+  notify: enable angie
+
+- name: Copy Angie conf
+  ansible.builtin.copy:
+    src: "angie.conf"
+    dest: /etc/angie/angie.conf
+  notify: reload angie
+
+- name: Install PHP packages for WEB server
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - php
+    - php-fpm
+    - php-mysql
+    - php-mysqlnd
+    - php-gd
+    - php-intl
+    - php-mbstring
+    - php-soap
+    - php-xml
+    - php-xmlrpc
+    - php-zip
+    - php-common
+    - php-opcache
+    - php-mcrypt
+    - php-cli
+    - php-gd
+    - php-curl
+  notify: Enable and restart php-fpm
+
+- name: "Download Wordpress archive"
+  shell: |
+      wget "https://wordpress.org/latest.tar.gz"
+
+- name: Unarchive Wordpress
+  unarchive:
+    src: /home/admind/latest.tar.gz
+    dest: /mnt/gfs2_storage/
+    remote_src: yes
+
+- name: Set owner for Wordpress directory
+  file:
+    path: /mnt/gfs2_storage/wordpress
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- name: Copy Web-Site config
+  ansible.builtin.copy:
+    src: "default.conf"
+    dest: /etc/angie/http.d/default.conf
+  notify: reload angie
+

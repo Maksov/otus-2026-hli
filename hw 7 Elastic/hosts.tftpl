@@ -1,0 +1,22 @@
+[nodes]
+%{ for server in nodes ~}
+${server.name} ansible_host=${server.network_interface[0].ip_address} ip=${server.network_interface[0].ip_address} ansible_user=admind
+%{ endfor ~}
+
+[iscsi_server]
+${iscsi-server.name} ansible_host=${iscsi-server.network_interface[0].ip_address}  ip=${iscsi-server.network_interface[0].ip_address} ansible_user=admind
+
+[iscsi_net:children]
+nodes
+iscsi_server
+
+[db_servers]
+${db-server.name} ansible_host=${db-server.network_interface[0].ip_address} ip=${db-server.network_interface[0].ip_address} ansible_user=admind
+
+[jump_server]
+${jump-server.name} ansible_host=${jump-server.network_interface[0].ip_address} ip=${jump-server.network_interface[0].ip_address} ansible_user=admind
+
+
+[all:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyJump="admind@${ jump-server.network_interface[0].nat_ip_address }"'
+

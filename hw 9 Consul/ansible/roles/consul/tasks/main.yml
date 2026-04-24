@@ -1,0 +1,12 @@
+---
+- name: Include consul-servers
+  include_tasks: consul-servers.yml
+  when: inventory_hostname in groups['cs_servers']
+
+- name: Include consul-clients
+  include_tasks: consul-clients.yml
+  when: inventory_hostname in (groups['jump_server'] + groups['nodes'])
+
+# - name: Include consul-templates
+#   include_tasks: consul-templates.yml
+#   when: inventory_hostname in groups['nginx_servers']

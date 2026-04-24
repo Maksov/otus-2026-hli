@@ -1,0 +1,30 @@
+---
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ percona_required_packages }}"
+  register: rh_percona_install_required_packages
+
+- name: Ensure Percona repositories are installed
+  ansible.builtin.package:
+    name: "{{ percona_repo_baseurl }}/{{ percona_repo_release }}.noarch.rpm"
+    state: present
+    disable_gpg_check: true
+
+- name: Setup Percona release
+  ansible.builtin.command: percona-release setup ps{{ percona_version }}
+  changed_when: false
+
+- name: Disable mariadb module (RedHat 9)
+  ansible.builtin.command: dnf module disable mariadb -y
+  changed_when: false
+  when: 
+    - ansible_os_family == 'RedHat'
+
+- name: Ensure Percona packages are installed.
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ percona_packages }}"
+  register: rh_percona_install_required_packages
