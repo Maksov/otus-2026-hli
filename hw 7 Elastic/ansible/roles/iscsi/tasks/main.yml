@@ -53,8 +53,13 @@
 
   - name: Waiting restarted ISCSI Service
     pause:
-      seconds: 30
+      seconds: 15
+    when: ansible_hostname is match("pcs-*")
 
+  - name: Waiting restarted ISCSI Service 2
+    pause:
+      seconds: 15
+    when: ansible_hostname is match("pcs-*")
 
   - name: Connect iscsi in PCS Servers
     shell: |

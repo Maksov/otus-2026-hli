@@ -5,27 +5,44 @@
     - name: Пинг хоста
       ansible.builtin.ping:
 
-# - name: Install and configuration ISCSI
-#   hosts: iscsi_net
-#   gather_facts: true
-#   become: true
-#   roles:
-#     - iscsi
+- name: Opensearch installation & configuration
+  hosts: os-cluster
+  gather_facts: true
+  become: true
+  roles:
+    - { role: opensearch, tags: os-servers_tag }
+
+- name: Opensearch dashboards installation & configuration
+  hosts: dashboards
+  gather_facts: true
+  become: true
+  roles:
+    - { role: dashboards, tags: dasboards_tag }
+     
+- name: Install and configuration Percona Server
+  hosts: db_servers
+  gather_facts: true
+  become: true
+  roles:
+    - bmeme.percona_server
+    - filebeats
+
+- name: Install and configuration ISCSI
+  hosts: iscsi_net
+  gather_facts: true
+  become: true
+  roles:
+    - iscsi
   
 
-# - name: Install and configuration Pacemaker
-#   hosts: nodes
-#   gather_facts: true
-#   become: true
-#   roles:
-#     - gfs2
-#     - pacemaker
-#     - angie
+- name: Install and configuration Pacemaker
+  hosts: nodes
+  gather_facts: true
+  become: true
+  roles:
+    - gfs2
+    - pacemaker
+    - angie
+    - filebeats
     
-     
-# - name: Install and configuration Percona Server
-#   hosts: db_servers
-#   gather_facts: true
-#   become: true
-#   roles:
-#     - bmeme.percona_server
+

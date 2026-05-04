@@ -16,6 +16,18 @@ ${db-server.name} ansible_host=${db-server.network_interface[0].ip_address} ip=$
 [jump_server]
 ${jump-server.name} ansible_host=${jump-server.network_interface[0].ip_address} ip=${jump-server.network_interface[0].ip_address} ansible_user=admind
 
+[os-cluster]
+%{ for os in os-servers ~}
+${os.name} ansible_host=${os.network_interface[0].ip_address} ip=${os.network_interface[0].ip_address} ansible_user=admind roles=data,master,ingest
+%{ endfor ~}
+
+[master]
+%{ for os in os-servers ~}
+${ os["name"] }
+%{ endfor ~}
+
+[dashboards]
+${jump-server.name}
 
 [all:vars]
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyJump="admind@${ jump-server.network_interface[0].nat_ip_address }"'

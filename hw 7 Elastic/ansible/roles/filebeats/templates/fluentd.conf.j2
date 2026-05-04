@@ -1,0 +1,72 @@
+# --- Источники данных (Inputs) ---
+
+{% if inventory_hostname in groups['nodes'] %}
+# Сбор логов Angie
+<source>
+  @type tail
+  @id input_angie_access
+  path /var/log/angie/access.log
+  pos_file /var/log/fluent/angie_access.log.pos
+  tag angie.access
+  <parse>
+    @type nginx
+  </parse>
+</source>
+
+<source>
+  @type tail
+  @id input_angie_error
+  path /var/log/angie/error.log
+  pos_file /var/log/fluent/angie_error.log.pos
+  tag angie.error
+  <parse>
+    @type none
+  </parse>
+</source>
+{% endif %}
+
+{% if inventory_hostname in groups['db_servers'] %}
+# Сбор логов MySQL
+<source>
+  @type tail
+  @id input_mysql_logs
+  path /var/log/mysql/error.log, /var/log/mysql/mysql-slow.log
+  pos_file /var/log/fluent/mysql.log.pos
+  tag mysql.logs
+  <parse>
+    @type none
+  </parse>
+</source>
+{% endif %}
+
+# --- Отправка данных (Output) ---
+
+<match **>
+  @type opensearch
+  @id output_opensearch
+  
+  # Динамическое перечисление всех узлов кластера OpenSearch
+  hosts {{ groups['os-cluster'] | map('extract', hostvars, 'ip') | map('regex_replace', '^(.*)$', 'https://\\1:9200') | join(',') }}
+  
+  user {{ opensearch_user | default('admin') }}
+  password {{ opensearch_password | default('admin') }}
+  
+  ssl_verify false
+  suppress_type_name true
+  
+  # Формирование имени индекса на основе тега (angie.* или mysql.*)
+  logstash_format true
+  logstash_prefix ${tag}
+  logstash_dateformat %Y.%m.%d
+
+  <buffer tag>
+    @type file
+    path /var/log/fluent/buffer/opensearch.buff
+    flush_mode interval
+    flush_interval 5s
+    retry_type exponential_backoff
+    retry_max_interval 30s
+    chunk_limit_size 2M
+    queue_limit_length 32
+  </buffer>
+</match>

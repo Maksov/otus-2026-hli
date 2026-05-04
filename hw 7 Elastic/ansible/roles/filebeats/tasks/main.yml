@@ -1,0 +1,30 @@
+---
+## curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-8.11.0-x86_64.rpm 
+#- name: Logstash Install | Download Logstash {{ os_version }}
+#  ansible.builtin.get_url:
+#    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-8.11.0-x86_64.rpm
+#    dest: /tmp/filebeat-8.11.0-x86_64.rpm
+#  register: download
+
+- name: Fluentd Install | Copy Fluentd package
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop:
+    - fluent-package_6.0.3-1_amd64.deb
+
+- name: Fluentd Install | Install fluentd
+  ansible.builtin.apt:
+    deb: /tmp/fluent-package_6.0.3-1_amd64.deb
+    state: present
+
+- name: Fluentd Install | Configure Fluentd
+  ansible.builtin.template:
+    src: fluentd.conf.j2
+    dest: /etc/fluent/fluentd.conf
+
+- name: Fluentd Install | Start fluentd
+  ansible.builtin.systemd:
+    name: fluentd
+    state: restarted
+    enabled: true
