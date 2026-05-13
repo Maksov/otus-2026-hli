@@ -2,3 +2,4 @@
 
 hw 5 PXC/ansible/roles/mysql/files/ssl/ca-key.pem
 hw 5 PXC/ansible/roles/mysql/files/ssl/server-req.pem
+hw 10 Proxmox/credentials.auto.tfvars
