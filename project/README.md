@@ -44,21 +44,21 @@ OTUS Проектная работа
 #### «Комплексная настройка отказоустойчивого кластера виртуализации для запуска CMS Wordpress»
 
 1. Подготовка окружения:
-
-ОС Microsoft Windows 11 WSL 2.0 Ubuntu 22.04
-Ansible 2.12.3
-Terraform v1.14.5
-Yandex Cloud CLI 1.0.0
-Terraform Provider Yandex v0.200.0
+- ОС Microsoft Windows 11 WSL 2.0 Ubuntu 22.04
+- Ansible 2.12.3
+- Terraform v1.14.5
+- Yandex Cloud CLI 1.0.0
+- Terraform Provider Yandex v0.200.0
 
 2. Написание манифестов Terraform (особенности)
-
 Каждый тип инстанса вынесли в отдельный файл:
+```
 |- db.tf
 |- pcs-vms.tf
 |- os-vms.tf
 |- iscsi.tf
 |- jump.tf
+```
 
 Доступ к вм настраивается с помощью cloud-init.yml
 
