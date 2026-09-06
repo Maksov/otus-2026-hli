@@ -50,6 +50,8 @@ OTUS Проектная работа
 - Yandex Cloud CLI 1.0.0
 - Terraform Provider Yandex v0.200.0
 
+![alt text](otus-hli-project.draw.png)
+
 2. Написание манифестов Terraform (особенности)
 Каждый тип инстанса вынесли в отдельный файл:
 ```
